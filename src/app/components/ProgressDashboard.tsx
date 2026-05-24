@@ -1,5 +1,5 @@
-import { useMemo, useState } from "react";
-import { TrendingUp, BookOpen, Target, Bell, ChevronRight, Award, MoreHorizontal } from "lucide-react";
+import { useMemo } from "react";
+import { TrendingUp, BookOpen, Target, Bell, ChevronRight, Award } from "lucide-react";
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 import type { ScreenProps } from "../types";
 import { BrandMark } from "./common/BrandMark";
@@ -22,29 +22,6 @@ const BASE_MILESTONES = [
   { id: 5, label: "Reach $1,000 invested", done: false },
 ];
 
-const LEARNING_MODULES = [
-  {
-    id: 1,
-    title: "Why diversification helps",
-    duration: "30 sec",
-    points: [
-      "Your money is spread across multiple assets.",
-      "A single dip matters less when your portfolio is diversified.",
-      "Long-term consistency matters more than perfect timing.",
-    ],
-  },
-  {
-    id: 2,
-    title: "What to expect from market ups and downs",
-    duration: "35 sec",
-    points: [
-      "Short-term changes are normal and expected.",
-      "Your plan is designed for your timeline, not daily swings.",
-      "Regular investing can smooth out volatility over time.",
-    ],
-  },
-];
-
 const ACTION_ITEMS = [
   { id: "learning", icon: BookOpen, color: "#7B3FD4", bg: "#F4EEFF" },
   { id: "target", icon: Target, color: "#0066CC", bg: "#EFF5FF", label: "Set a savings target for your FHSA" },
@@ -63,11 +40,9 @@ function CustomTooltip({ active, payload, label }: any) {
   return null;
 }
 
-export function ProgressDashboard({ onNext, onBack }: ScreenProps) {
-  const [showLearningModules, setShowLearningModules] = useState(false);
-  const [completedLearningModules, setCompletedLearningModules] = useState<number[]>([]);
-
-  const remainingLearningModules = Math.max(0, 2 - completedLearningModules.length);
+export function ProgressDashboard({ onNext, completedModules, navigateToScreen }: ScreenProps) {
+  const requiredModules = 3;
+  const remainingLearningModules = Math.max(0, requiredModules - completedModules.length);
   const learningLabel =
     remainingLearningModules > 0
       ? `Complete ${remainingLearningModules} more learning module${remainingLearningModules === 1 ? "" : "s"}`
@@ -76,23 +51,17 @@ export function ProgressDashboard({ onNext, onBack }: ScreenProps) {
   const milestones = useMemo(
     () =>
       BASE_MILESTONES.map((milestone) =>
-        milestone.id === 4 ? { ...milestone, done: completedLearningModules.length >= 2 } : milestone,
+        milestone.id === 4 ? { ...milestone, done: completedModules.length >= requiredModules } : milestone,
       ),
-    [completedLearningModules],
+    [completedModules],
   );
 
   const doneMilestones = milestones.filter((m) => m.done).length;
   const confidenceScore = 72;
 
-  const toggleLearningModuleComplete = (moduleId: number) => {
-    setCompletedLearningModules((prev) =>
-      prev.includes(moduleId) ? prev.filter((id) => id !== moduleId) : [...prev, moduleId],
-    );
-  };
-
   const handleNextAction = (actionId: string) => {
     if (actionId === "learning") {
-      setShowLearningModules(true);
+      navigateToScreen(8);
       return;
     }
     onNext();
@@ -213,7 +182,7 @@ export function ProgressDashboard({ onNext, onBack }: ScreenProps) {
               <span style={{ fontSize: 14, fontWeight: 700, color: "#1A1A1A" }}>Learning Milestones</span>
             </div>
             <span style={{ fontSize: 12, color: "#717182" }}>
-              {doneMilestones}/{MILESTONES.length} done
+              {doneMilestones}/{BASE_MILESTONES.length} done
             </span>
           </div>
           <div
@@ -225,7 +194,7 @@ export function ProgressDashboard({ onNext, onBack }: ScreenProps) {
               <div
                 style={{
                   height: "100%",
-                  width: `${(doneMilestones / MILESTONES.length) * 100}%`,
+                  width: `${(doneMilestones / BASE_MILESTONES.length) * 100}%`,
                   background: "linear-gradient(90deg, #EC0000, #C8102E)",
                   transition: "width 0.4s ease",
                 }}
@@ -295,62 +264,6 @@ export function ProgressDashboard({ onNext, onBack }: ScreenProps) {
               </button>
             ))}
           </div>
-
-          {showLearningModules && (
-            <div
-              className="mt-3 rounded-2xl p-3"
-              style={{ background: "#FBFAFF", border: "1px solid #EEE8FF" }}
-            >
-              <div className="flex items-center justify-between mb-2">
-                <span style={{ fontSize: 13, fontWeight: 700, color: "#3F2C67" }}>Learning modules</span>
-                <span style={{ fontSize: 11.5, color: "#7D6AA5" }}>
-                  {completedLearningModules.length}/2 completed
-                </span>
-              </div>
-              <div className="space-y-2">
-                {LEARNING_MODULES.map((module) => {
-                  const done = completedLearningModules.includes(module.id);
-                  return (
-                    <div
-                      key={module.id}
-                      className="rounded-xl p-3"
-                      style={{ background: "#FFFFFF", border: "1px solid #EEE8FF" }}
-                    >
-                      <div className="flex items-center justify-between mb-2">
-                        <div>
-                          <p style={{ fontSize: 13, fontWeight: 600, color: "#1A1A1A" }}>{module.title}</p>
-                          <p style={{ fontSize: 11.5, color: "#7D6AA5" }}>{module.duration}</p>
-                        </div>
-                        <button
-                          onClick={() => toggleLearningModuleComplete(module.id)}
-                          style={{
-                            border: `1px solid ${done ? "#A9E1CE" : "#E1E3EA"}`,
-                            background: done ? "#EBF7F3" : "#F8F8FA",
-                            color: done ? "#008060" : "#5E6372",
-                            height: 30,
-                            padding: "0 10px",
-                            borderRadius: 999,
-                            fontSize: 11.5,
-                            fontWeight: 600,
-                            cursor: "pointer",
-                          }}
-                        >
-                          {done ? "Completed" : "Mark complete"}
-                        </button>
-                      </div>
-                      <ul className="pl-4" style={{ margin: 0 }}>
-                        {module.points.map((point) => (
-                          <li key={point} style={{ fontSize: 12, color: "#5E6372", lineHeight: 1.45, marginBottom: 4 }}>
-                            {point}
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-          )}
         </div>
       </div>
     </div>

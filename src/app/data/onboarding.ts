@@ -15,6 +15,7 @@ export const screenLabels = [
   "First Investment",
   "Dashboard",
   "Smart Nudge",
+  "Learning Modules",
 ] as const;
 
 export type ScreenLabel = (typeof screenLabels)[number];

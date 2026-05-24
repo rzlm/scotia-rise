@@ -13,7 +13,10 @@ export interface UserProfile {
 export interface ScreenProps {
   onNext: () => void;
   onBack: () => void;
+  navigateToScreen: (screen: number) => void;
   profile: UserProfile;
   setProfile: React.Dispatch<React.SetStateAction<UserProfile>>;
+  completedModules: number[];
+  setCompletedModules: React.Dispatch<React.SetStateAction<number[]>>;
 }
 
