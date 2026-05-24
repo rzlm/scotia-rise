@@ -1,3 +1,4 @@
+import { useMemo, useState } from "react";
 import { TrendingUp, BookOpen, Target, Bell, ChevronRight, Award, MoreHorizontal } from "lucide-react";
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 import type { ScreenProps } from "../types";
@@ -13,7 +14,7 @@ const chartData = [
   { month: "May", value: 724 },
 ];
 
-const MILESTONES = [
+const BASE_MILESTONES = [
   { id: 1, label: "Account opened", done: true },
   { id: 2, label: "First deposit made", done: true },
   { id: 3, label: "Set up auto-invest", done: true },
@@ -21,10 +22,33 @@ const MILESTONES = [
   { id: 5, label: "Reach $1,000 invested", done: false },
 ];
 
-const NEXT_ACTIONS = [
-  { icon: BookOpen, label: "Complete 2 more learning modules", color: "#7B3FD4", bg: "#F4EEFF" },
-  { icon: Target, label: "Set a savings target for your FHSA", color: "#0066CC", bg: "#EFF5FF" },
-  { icon: Bell, label: "Enable deposit alerts", color: "#EC0000", bg: "#FFF0F0" },
+const LEARNING_MODULES = [
+  {
+    id: 1,
+    title: "Why diversification helps",
+    duration: "30 sec",
+    points: [
+      "Your money is spread across multiple assets.",
+      "A single dip matters less when your portfolio is diversified.",
+      "Long-term consistency matters more than perfect timing.",
+    ],
+  },
+  {
+    id: 2,
+    title: "What to expect from market ups and downs",
+    duration: "35 sec",
+    points: [
+      "Short-term changes are normal and expected.",
+      "Your plan is designed for your timeline, not daily swings.",
+      "Regular investing can smooth out volatility over time.",
+    ],
+  },
+];
+
+const ACTION_ITEMS = [
+  { id: "learning", icon: BookOpen, color: "#7B3FD4", bg: "#F4EEFF" },
+  { id: "target", icon: Target, color: "#0066CC", bg: "#EFF5FF", label: "Set a savings target for your FHSA" },
+  { id: "alerts", icon: Bell, color: "#EC0000", bg: "#FFF0F0", label: "Enable deposit alerts" },
 ];
 
 function CustomTooltip({ active, payload, label }: any) {
@@ -40,8 +64,39 @@ function CustomTooltip({ active, payload, label }: any) {
 }
 
 export function ProgressDashboard({ onNext, onBack }: ScreenProps) {
-  const doneMilestones = MILESTONES.filter((m) => m.done).length;
+  const [showLearningModules, setShowLearningModules] = useState(false);
+  const [completedLearningModules, setCompletedLearningModules] = useState<number[]>([]);
+
+  const remainingLearningModules = Math.max(0, 2 - completedLearningModules.length);
+  const learningLabel =
+    remainingLearningModules > 0
+      ? `Complete ${remainingLearningModules} more learning module${remainingLearningModules === 1 ? "" : "s"}`
+      : "Learning modules complete";
+
+  const milestones = useMemo(
+    () =>
+      BASE_MILESTONES.map((milestone) =>
+        milestone.id === 4 ? { ...milestone, done: completedLearningModules.length >= 2 } : milestone,
+      ),
+    [completedLearningModules],
+  );
+
+  const doneMilestones = milestones.filter((m) => m.done).length;
   const confidenceScore = 72;
+
+  const toggleLearningModuleComplete = (moduleId: number) => {
+    setCompletedLearningModules((prev) =>
+      prev.includes(moduleId) ? prev.filter((id) => id !== moduleId) : [...prev, moduleId],
+    );
+  };
+
+  const handleNextAction = (actionId: string) => {
+    if (actionId === "learning") {
+      setShowLearningModules(true);
+      return;
+    }
+    onNext();
+  };
 
   return (
     <div className="flex flex-col bg-white" style={{ minHeight: "100%" }}>
@@ -176,11 +231,11 @@ export function ProgressDashboard({ onNext, onBack }: ScreenProps) {
                 }}
               />
             </div>
-            {MILESTONES.map((m, i) => (
+            {milestones.map((m, i) => (
               <div
                 key={m.id}
                 className="flex items-center gap-3 px-4 py-3"
-                style={{ borderBottom: i < MILESTONES.length - 1 ? "1px solid #F8F8FA" : "none" }}
+                style={{ borderBottom: i < milestones.length - 1 ? "1px solid #F8F8FA" : "none" }}
               >
                 <div
                   style={{
@@ -216,10 +271,10 @@ export function ProgressDashboard({ onNext, onBack }: ScreenProps) {
             <span style={{ fontSize: 14, fontWeight: 700, color: "#1A1A1A" }}>Next Actions</span>
           </div>
           <div className="space-y-2">
-            {NEXT_ACTIONS.map(({ icon: Icon, label, color, bg }) => (
+            {ACTION_ITEMS.map(({ id, icon: Icon, label, color, bg }) => (
               <button
-                key={label}
-                onClick={onNext}
+                key={id}
+                onClick={() => handleNextAction(id)}
                 className="w-full flex items-center gap-3 p-3.5 rounded-xl"
                 style={{
                   background: "#F8F8FA",
@@ -233,11 +288,69 @@ export function ProgressDashboard({ onNext, onBack }: ScreenProps) {
                 >
                   <Icon size={16} color={color} />
                 </div>
-                <span style={{ flex: 1, fontSize: 13, color: "#1A1A1A", lineHeight: 1.4 }}>{label}</span>
+                <span style={{ flex: 1, fontSize: 13, color: "#1A1A1A", lineHeight: 1.4 }}>
+                  {id === "learning" ? learningLabel : label}
+                </span>
                 <ChevronRight size={15} color="#ADADB8" />
               </button>
             ))}
           </div>
+
+          {showLearningModules && (
+            <div
+              className="mt-3 rounded-2xl p-3"
+              style={{ background: "#FBFAFF", border: "1px solid #EEE8FF" }}
+            >
+              <div className="flex items-center justify-between mb-2">
+                <span style={{ fontSize: 13, fontWeight: 700, color: "#3F2C67" }}>Learning modules</span>
+                <span style={{ fontSize: 11.5, color: "#7D6AA5" }}>
+                  {completedLearningModules.length}/2 completed
+                </span>
+              </div>
+              <div className="space-y-2">
+                {LEARNING_MODULES.map((module) => {
+                  const done = completedLearningModules.includes(module.id);
+                  return (
+                    <div
+                      key={module.id}
+                      className="rounded-xl p-3"
+                      style={{ background: "#FFFFFF", border: "1px solid #EEE8FF" }}
+                    >
+                      <div className="flex items-center justify-between mb-2">
+                        <div>
+                          <p style={{ fontSize: 13, fontWeight: 600, color: "#1A1A1A" }}>{module.title}</p>
+                          <p style={{ fontSize: 11.5, color: "#7D6AA5" }}>{module.duration}</p>
+                        </div>
+                        <button
+                          onClick={() => toggleLearningModuleComplete(module.id)}
+                          style={{
+                            border: `1px solid ${done ? "#A9E1CE" : "#E1E3EA"}`,
+                            background: done ? "#EBF7F3" : "#F8F8FA",
+                            color: done ? "#008060" : "#5E6372",
+                            height: 30,
+                            padding: "0 10px",
+                            borderRadius: 999,
+                            fontSize: 11.5,
+                            fontWeight: 600,
+                            cursor: "pointer",
+                          }}
+                        >
+                          {done ? "Completed" : "Mark complete"}
+                        </button>
+                      </div>
+                      <ul className="pl-4" style={{ margin: 0 }}>
+                        {module.points.map((point) => (
+                          <li key={point} style={{ fontSize: 12, color: "#5E6372", lineHeight: 1.45, marginBottom: 4 }}>
+                            {point}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </div>
