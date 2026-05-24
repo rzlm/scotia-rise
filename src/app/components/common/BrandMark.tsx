@@ -1,4 +1,4 @@
-import ScotiaLogo from '../../../assets/scotiabank-logo.svg';
+import ScotiaLogo from '../../../assets/scotiabank-logo.png';
 
 interface BrandMarkProps {
   tone?: "light" | "solid";
