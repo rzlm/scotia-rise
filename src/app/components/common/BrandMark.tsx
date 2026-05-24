@@ -1,3 +1,5 @@
+import ScotiaLogo from '../../../assets/scotiabank-logo.svg';
+
 interface BrandMarkProps {
   tone?: "light" | "solid";
   subtitle?: string;
@@ -10,17 +12,8 @@ export function BrandMark({ tone = "solid", subtitle = "iTRADE INVESTING", compa
 
   return (
     <div className="flex items-center gap-2.5">
-      <div
-        className="flex items-center justify-center"
-        style={{
-          width: markSize,
-          height: markSize,
-          background: isLight ? "rgba(255,255,255,0.15)" : "#EC0000",
-          borderRadius: 10,
-          border: isLight ? "1px solid rgba(255,255,255,0.25)" : "none",
-        }}
-      >
-        <ScotiaGlyph size={compact ? 16 : 20} />
+      <div className="flex items-center justify-center" style={{ width: markSize, height: markSize, borderRadius: 10, border: isLight ? "1px solid rgba(255,255,255,0.25)" : "none", background: 'transparent' }}>
+        <img src={ScotiaLogo} alt="Scotiabank" style={{ width: compact ? 16 : 20, height: compact ? 16 : 20, objectFit: 'contain', display: 'block' }} />
       </div>
       <div>
         <div
