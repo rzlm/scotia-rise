@@ -1,20 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" aria-hidden="true">
-  <defs>
-    <clipPath id="round">
-      <rect x="0" y="0" width="120" height="120" rx="18" ry="18" />
-    </clipPath>
-  </defs>
-  <g clip-path="url(#round)">
-    <rect width="120" height="120" fill="#EC0000" />
-    <g transform="translate(18,18) scale(0.7)">
-      <circle cx="30" cy="30" r="28" fill="none" stroke="#FFFFFF" stroke-width="3" />
-      <path d="M2 30h56" stroke="#FFFFFF" stroke-width="2" />
-      <path d="M2 18h56" stroke="#FFFFFF" stroke-width="1" opacity="0.8" />
-      <path d="M2 42h56" stroke="#FFFFFF" stroke-width="1" opacity="0.8" />
-      <path d="M30 2v56" stroke="#FFFFFF" stroke-width="2" />
-      <path d="M22 2c6 16 22 16 30 0" stroke="#FFFFFF" stroke-width="3" fill="none" stroke-linecap="round" />
-      <path d="M22 56c6-16 22-16 30 0" stroke="#FFFFFF" stroke-width="3" fill="none" stroke-linecap="round" />
-    </g>
-  </g>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" role="img" aria-label="Scotiabank logo">
+  <rect width="120" height="120" fill="#E70000" />
+  <!-- White circular core -->
+  <circle cx="60" cy="60" r="26" fill="#FFFFFF" />
+  <!-- Top-left swoosh -->
+  <path d="M30 28 C44 10, 86 10, 102 28 L86 28 C72 12, 46 20, 36 36 Z" fill="#FFFFFF" opacity="1" transform="translate(-8,6) scale(0.9)" />
+  <!-- Bottom-right swoosh -->
+  <path d="M90 92 C76 110, 34 110, 18 92 L34 92 C48 108, 74 100, 84 84 Z" fill="#FFFFFF" opacity="1" transform="translate(8,-6) scale(0.9)" />
 </svg>
+      <circle cx="30" cy="30" r="28" fill="none" stroke="#FFFFFF" stroke-width="3" />
